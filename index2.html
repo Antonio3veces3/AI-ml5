@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+
+    <title>Regression</title>
+  </head>
+  <body>
+    <script>
+      const data = [
+        { S: 0.0125, C: 0.06, M: 0.08333333, status: 0 },
+        { S: 0.1, C: 0.3, M: 0.333333333, status: 0 },
+        { S: 0.5, C: 0.3, M: 1, status: 0 },
+        { S: 0.15, C: 1.0, M: 0.666666667, status: 0},
+        { S: 0.125, C: 0.2, M: 0.3333, status: 0 },
+        { S: 0.5, C: 0.5, M: 0.66666667, status: 0 },
+        { S: 0.375, C: 0.12, M: 0.333333333, status: 1},
+        { S: 0.5, C: 0.2, M: 0.666666667, status: 1 },
+        { S: 0.875, C: 0.4, M: 0.833333333, status: 1 },
+        { S: 0.25, C: 0.1, M: 0.08333333, status: 1 },
+        { S: 0.25, C: 0.05, M: 0.083333333, status: 1 },
+      ];
+
+      const options = {
+        task: "regression",
+        debug: true,
+      };
+
+      const neuralNetwork = ml5.neuralNetwork(options);
+
+      data.forEach((i) => {
+        const inputs = {
+          S: i.S,
+          C: i.C,
+          M: i.M,
+        };
+
+        const outputs = {
+          status: i.status,
+        };
+
+        neuralNetwork.addData(inputs, outputs);
+      });
+
+      neuralNetwork.normalizeData();
+
+      const trainingOptions = {
+        epochs: 100,
+        batchSize: 12,
+      };
+
+      neuralNetwork.train(trainingOptions, finishedTraining);
+
+      function finishedTraining() {
+        classify();
+      }
+
+      function classify() {
+        const input =  {S: 0.25, C: 0.1, M: 0.08333333};
+        neuralNetwork.predict(input,handleResults)
+      }
+      function handleResults(error, result) {
+        if (error) {
+          console.error(error);
+          return;
+        }
+        console.log(`${result[0].status * 100} %`);
+      }
+    </script>
+  </body>
+</html>
